@@ -221,7 +221,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .ed-top-meta{flex:1;text-align:center;font-size:11px;color:var(--ink-soft)}
 .ed-title-input{flex:none;font-size:24px;font-weight:700;border:0;background:none;outline:0;width:100%;padding:6px 22px 8px;color:var(--ink);direction:rtl}
 .ed-title-input::placeholder{color:var(--ink-faint);text-align:right;direction:rtl}
-.ed-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:56px 24px 140px 42px;scroll-padding-bottom:160px;transition:padding-bottom .25s ease}
+.ed-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:6px 24px 140px 42px;scroll-padding-bottom:160px;transition:padding-bottom .25s ease}
 .ed-scroll::-webkit-scrollbar{width:0}
 .ed-canvas{position:relative}
 
@@ -283,23 +283,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .ed-tool{border:0;background:none;color:var(--ink-soft);font:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:600;cursor:pointer;padding:6px 7px;border-radius:14px}
 .ed-tool:active{background:rgba(255,255,255,.1);color:var(--ink)}
 .ed-tool .aa{font-size:16px;font-weight:700;line-height:1}
-.ed-top-spacer{width:40px;height:40px;flex:none}
 
-/* ============ أزرار عائمة زجاج سائل أعلى يمين المحرر ============ */
-#edFloat{position:absolute;top:112px;right:12px;z-index:21;display:flex;gap:8px;pointer-events:none}
-#edFloat>*{pointer-events:auto}
-.fab-glass{width:42px;height:42px;border-radius:21px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.1);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none;backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 12px 28px -12px rgba(0,0,0,.75);transition:opacity .25s ease,background .2s ease;will-change:transform}
-.fab-glass:hover{background:rgba(255,255,255,.16)}
-.fab-glass:active{background:rgba(255,255,255,.22)}
-.fab-glass:disabled{opacity:.3;pointer-events:none}
-@media(max-width:359px){#edFloat{gap:6px}.fab-glass{width:38px;height:38px;border-radius:19px}}
-
-.pop{position:absolute;bottom:152px;left:50%;width:180px;border-radius:16px;padding:8px;z-index:30;transform:translateX(-50%) scale(.6);opacity:0;transform-origin:50% 100%;pointer-events:none;transition:transform .4s cubic-bezier(.3,1.5,.4,1),opacity .2s}
+.pop{position:absolute;bottom:86px;left:50%;width:180px;border-radius:16px;padding:8px;z-index:30;transform:translateX(-50%) scale(.6);opacity:0;transform-origin:50% 100%;pointer-events:none;transition:transform .4s cubic-bezier(.3,1.5,.4,1),opacity .2s}
 .pop.open{transform:translateX(-50%) scale(1);opacity:1;pointer-events:auto}
 .pop button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;font:inherit;font-size:13.5px;color:var(--ink);padding:9px 12px;border-radius:10px;cursor:pointer;text-align:right}
 .pop button:hover{background:rgba(255,255,255,.08)}
 
-#minimap{position:absolute;top:162px;bottom:104px;right:-4px;width:30px;z-index:8;touch-action:none;opacity:0;transition:opacity .3s;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#minimap{position:absolute;top:120px;bottom:104px;right:-4px;width:30px;z-index:8;touch-action:none;opacity:0;transition:opacity .3s;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 #mmTrack{position:absolute;top:4px;bottom:4px;right:4px;width:20px}
 .mm-mark{position:absolute;right:0;height:2px;border-radius:2px;background:#7A7260;opacity:.6;pointer-events:none}
 .mm-mark.h{width:11px;background:var(--acc);opacity:.95}
@@ -529,7 +519,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
   <section id="editor" aria-hidden="true">
     <div class="ed-inner">
       <header class="ed-top ed-chrome">
-        <span class="ed-top-spacer" aria-hidden="true"></span>
+        <button class="icon-btn" id="edBack" aria-label="رجوع"></button>
+        <button class="icon-btn" id="edUndo" aria-label="تراجع" disabled></button>
+        <button class="icon-btn" id="edRedo" aria-label="إعادة" disabled></button>
         <div class="ed-top-meta" id="edDate"></div>
         <button class="icon-btn danger" id="edDelete" aria-label="حذف الملاحظة"></button>
       </header>
@@ -550,13 +542,6 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
       <button class="ed-tool" data-act="aa"><span class="aa">Aa</span><span>تنسيق</span></button>
       <button class="ed-tool" data-act="mic"><span class="t-ic" data-ic="mic"></span><span>صوت</span></button>
       <button class="ed-tool" data-act="image"><span class="t-ic" data-ic="image"></span><span>صورة</span></button>
-    </div>
-
-    <!-- الأزرار العائمة داخل المحرر: خروج + تراجع + تقدم — زجاج سائل أعلى اليمين -->
-    <div id="edFloat" class="ed-chrome">
-      <button class="fab-glass glass" id="edExitF" aria-label="خروج من الملاحظة"></button>
-      <button class="fab-glass glass" id="edUndoF" aria-label="رجوع خطوة" disabled></button>
-      <button class="fab-glass glass" id="edRedoF" aria-label="تقدم خطوة" disabled></button>
     </div>
 
     <div id="aaPop" class="pop glass"></div>
@@ -1010,7 +995,7 @@ const app=$('#app'),ed=$('#editor'),edCanvas=$('#edCanvas'),edScroll=$('#edScrol
       notesViewEl=$('#notesView'),tasksViewEl=$('#tasksView'),
       listU=$('#listU'),listD=$('#listD'),headU=$('#headU'),headD=$('#headD'),
       cntU=$('#cntU'),cntD=$('#cntD'),tasksEmptyEl=$('#tasksEmpty'),
-      edUndoBtn=$('#edUndoF'),edRedoBtn=$('#edRedoF');
+      edUndoBtn=$('#edUndo'),edRedoBtn=$('#edRedo');
 
 let view='notes',notesQuery='',tasksQuery='',openNoteId=null,activeText=null,lastActiveBlockEl=null;
 const timerRefs=new Map(),taskDom=new Map();
@@ -1939,11 +1924,8 @@ function openEditor(note,fromEl){
   edScroll.scrollTop=0;
   morphIn((fromEl||fabBtn).getBoundingClientRect());
   deferGlass(edToolbar,null,600);deferGlass(mmEl,null,600);
-  /* زجاج سائل حقيقي للأزرار العائمة الثلاثة */
-  ['#edExitF','#edUndoF','#edRedoF'].forEach((s,i)=>deferGlass($(s),{radius:21},620+i*90));
+  /* زجاج سائل لأزرار الرأس */
   $$('.ed-top .icon-btn').forEach(b => deferGlass(b, {radius:20}, 620));
-  /* ظهور مطاطي للأزرار العائمة عند فتح الملاحظة */
-  popFloatEd();
   vibrate(8);
 }
 function closeEditor(){
@@ -1963,36 +1945,7 @@ function closeEditor(){
   updateSub();morphOut(tr);vibrate(6);
 }
 edTitle.addEventListener('input',()=>{const n=byId(openNoteId);if(n){n.title=edTitle.value;n.updatedAt=Date.now();saveSoon();pushHistorySoon(openNoteId)}});
-$('#edExitF').addEventListener('click',closeEditor);
-/* ===== الأزرار العائمة: نقر مطاطي جيلي ===== */
-function rubberTap(el){
-  el.animate([
-    {transform:'scale(1,1)'},
-    {transform:'scale(.84,.7) translateY(2px)',offset:.18},
-    {transform:'scale(1.16,.86)',offset:.42},
-    {transform:'scale(.9,1.1)',offset:.6},
-    {transform:'scale(1.07,.96)',offset:.76},
-    {transform:'scale(.98,1.02)',offset:.88},
-    {transform:'scale(1,1)'}
-  ],{duration:640,easing:'cubic-bezier(.3,.9,.35,1)'});
-}
-function popFloatEd(){
-  ['#edExitF','#edUndoF','#edRedoF'].forEach((s,i)=>{
-    const el=$(s);if(!el)return;
-    el.animate([
-      {opacity:0,transform:'translateY(-28px) scale(.5)'},
-      {opacity:1,transform:'translateY(5px) scale(1.08)',offset:.52},
-      {opacity:1,transform:'translateY(-3px) scale(.95)',offset:.72},
-      {opacity:1,transform:'translateY(1px) scale(1.03)',offset:.86},
-      {opacity:1,transform:'translateY(0) scale(1)'}
-    ],{duration:680,delay:260+i*90,easing:'cubic-bezier(.3,1.2,.4,1)',fill:'backwards'});
-  });
-}
-(function(){
-  $$('#edFloat .fab-glass').forEach(b=>{
-    b.addEventListener('pointerdown',()=>{if(!b.disabled)rubberTap(b)});
-  });
-})();
+$('#edBack').addEventListener('click',closeEditor);
 $('#edDelete').addEventListener('click',async()=>{
   const note=byId(openNoteId);if(!note)return;
   const ok=await confirmDlg({title:'حذف الملاحظة',body:'سيُحذف «'+(note.title||'بدون عنوان')+'» نهائيًا مع كل كتلها.',ok:'حذف'});
@@ -2344,7 +2297,7 @@ document.addEventListener('keydown',e=>{
 function init(){
   $('#btnMenu').innerHTML=icon('dots',22);
   fabBtn.innerHTML=icon('plus',26);
-  $('#edExitF').innerHTML=icon('back',22);
+  $('#edBack').innerHTML=icon('back',22);
   edUndoBtn.innerHTML=icon('undo',20);
   edRedoBtn.innerHTML=icon('redo',20);
   $('#edDelete').innerHTML=icon('trash',18);
@@ -2405,4 +2358,4 @@ init();
 })();
 </script>
 </body>
-</html>
+</html>
