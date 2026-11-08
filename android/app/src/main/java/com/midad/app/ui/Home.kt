@@ -56,7 +56,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.midad.app.glass.BackdropHost
+import com.midad.app.glass.GLASS_FALLBACK_SEARCH
 import com.midad.app.glass.GlassSurface
+import com.midad.app.glass.LocalBackdrop
+import com.midad.app.glass.rememberBackdropSource
 import com.midad.app.store.AppStore
 import com.midad.app.store.Block
 import com.midad.app.store.Note
@@ -76,6 +80,10 @@ fun HomeScreen(ui: MidadUi) {
     val appState = store.state
     val _dv = store.dataVersion // إعادة تركيب عند تغيّر هيكلي
 
+    // مصدر الخلفية المشترك — نفس فكرة backdrop-filter: القوائم تُسجَّل
+    // ويلتقطها الزجاج (البحث + الشريط السفلي) بضبابية وانكسار حقيقي
+    val backdrop = rememberBackdropSource()
+    androidx.compose.runtime.CompositionLocalProvider(LocalBackdrop provides backdrop) {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
             // ---- الشريط العلوي ----
@@ -116,11 +124,15 @@ fun HomeScreen(ui: MidadUi) {
 
             // ---- المحتوى + البحث الزجاجي العائم ----
             Box(Modifier.weight(1f)) {
-                if (ui.view == "notes") NotesContent(ui) else TasksContent(ui)
+                // القوائم تُسجَّل كخلفية يلتقطها الزجاج (BackdropHost)
+                BackdropHost(backdrop, Modifier.fillMaxSize()) {
+                    if (ui.view == "notes") NotesContent(ui) else TasksContent(ui)
+                }
 
                 // شريط البحث الزجاجي — يطفو فوق القائمة وينكسر خلفه التمرير
                 GlassSurface(
                     radius = 24.dp,
+                    fallbackColor = GLASS_FALLBACK_SEARCH,
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp, top = 12.dp)
                         .fillMaxWidth()
@@ -186,6 +198,7 @@ fun HomeScreen(ui: MidadUi) {
         } else {
             SelBar(ui, Modifier.align(Alignment.BottomCenter).padding(bottom = 14.dp))
         }
+    }
     }
 }
 

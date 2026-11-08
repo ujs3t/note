@@ -12,8 +12,8 @@ android {
         applicationId = "com.midad.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "2.9"
+        versionCode = 2
+        versionName = "3.0"
         resourceConfigurations += listOf("ar", "en")
     }
 
@@ -39,6 +39,12 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -51,4 +57,12 @@ dependencies {
     implementation("androidx.compose.ui:ui-text")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.animation:animation")
+
+    /* بيئة اختبار وهمية — Robolectric: إقلاع الواجهة والتقاط لقطات حقيقية على JVM */
+    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("androidx.test.ext:junit:1.2.1")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("androidx.compose.ui:ui-test-manifest")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

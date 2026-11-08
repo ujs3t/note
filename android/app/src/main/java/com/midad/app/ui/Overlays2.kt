@@ -163,7 +163,7 @@ fun DrawerOverlay(ui: MidadUi, onDismiss: () -> Unit) {
                 }
 
                 SecTitle("بيانات المطور", colors, fonts)
-                DevRow("التطبيق", "مِداد · الإصدار 2.9", colors, fonts)
+                DevRow("التطبيق", "مِداد · الإصدار 3.0", colors, fonts)
                 DevRow("البنية", "أندرويد أصلي · Kotlin + Compose", colors, fonts)
                 DevRow("التخزين", "محلي · midad.v2.json", colors, fonts)
                 DevRow("الخطوط", "IBM Plex Sans Arabic · Mono", colors, fonts)
@@ -236,13 +236,13 @@ private fun GlassSlider(
                         onDragCancel = { dragging = false }
                     ) { change, _ ->
                         change.consume()
-                        v = (change.position.x / size.width).coerceIn(0f, 1f)
+                        v = (1f - change.position.x / size.width).coerceIn(0f, 1f) // RTL: اليمين = الصفر مثل الويب
                         onChange(v)
                     }
                 }
                 .pointerInput(Unit) {
                     detectTapGestures { p ->
-                        v = (p.x / size.width).coerceIn(0f, 1f)
+                        v = (1f - p.x / size.width).coerceIn(0f, 1f)
                         onChange(v)
                     }
                 }
@@ -262,17 +262,24 @@ private fun GlassSlider(
                     .fillMaxWidth(v.coerceIn(0f, 1f))
                     .height(4.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(Color(0xFF82B1FF).copy(alpha = 0.55f))
+                    .background(colors.acc.copy(alpha = 0.55f))
             )
+            // الإبهام يركب نهاية التعبئة نفسها — محاذاة مضمونة في RTL و LTR
             Box(
                 Modifier
                     .align(Alignment.CenterStart)
-                    .offset(x = travel * v)
-                    .size(16.dp)
-                    .scale(thumbScale)
-                    .clip(CircleShape)
-                    .background(Color(0xFF82B1FF))
-            )
+                    .fillMaxWidth(v.coerceIn(0f, 1f))
+                    .height(16.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Box(
+                    Modifier
+                        .size(16.dp)
+                        .scale(thumbScale)
+                        .clip(CircleShape)
+                        .background(colors.acc)
+                )
+            }
         }
         MText(
             valueText, color = colors.acc, fontSize = 11.sp, fontFamily = fonts.mono,

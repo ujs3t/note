@@ -140,9 +140,22 @@ half4 main(float2 xy) {
 }
 """
 
+/** لون الزجاج عند تعطّل المحرك — مطابق لـ #app.perf .glass في الويب rgba(30,27,23,.88) */
+val GLASS_FALLBACK = Color(0xE01E1B17)
+
+/** لون البحث في وضع التوفير — مطابق لـ #app.perf .search.glass rgba(39,34,25,.94) */
+val GLASS_FALLBACK_SEARCH = Color(0xF0272219)
+
 /** مصدر الخلفية المسجّل الذي يتغذى عليه الزجاج (طبقة GPU واحدة لكل شاشة) */
 class BackdropSource(val layer: GraphicsLayer) {
     var origin by mutableStateOf(Offset.Zero)
+}
+
+/** يُنشئ مصدر خلفية لكل شاشة — تمرَّر إلى BackdropHost وكل الأسطح الزجاجية فيها */
+@Composable
+fun rememberBackdropSource(): BackdropSource {
+    val layer = rememberGraphicsLayer()
+    return remember { BackdropSource(layer) }
 }
 
 val LocalBackdrop = staticCompositionLocalOf<BackdropSource?> { null }
@@ -159,16 +172,15 @@ fun CompositionLocalGlassSettings(settings: GlassSettings, content: @Composable 
 /** يُسجّل محتوى الشاشة في GraphicsLayer ليلتقطه الزجاج خلفه — نفس فكرة backdrop-filter */
 @Composable
 fun BackdropHost(
+    source: BackdropSource,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val layer = rememberGraphicsLayer()
-    val source = remember { BackdropSource(layer) }
     Box(
         modifier
             .onGloballyPositioned { source.origin = it.positionInRoot() }
             .drawWithContent {
-                layer.record(
+                source.layer.record(
                     this, layoutDirection,
                     androidx.compose.ui.unit.IntSize(size.width.roundToInt(), size.height.roundToInt())
                 ) {
@@ -177,9 +189,7 @@ fun BackdropHost(
                 drawContent()
             }
     ) {
-        androidx.compose.runtime.CompositionLocalProvider(LocalBackdrop provides source) {
-            content()
-        }
+        content()
     }
 }
 
@@ -236,6 +246,7 @@ fun GlassSurface(
     settings: GlassSettings = LocalGlassSettings.current,
     tintAlpha: Float? = null,
     tintColor: Color = Color.White,
+    fallbackColor: Color = GLASS_FALLBACK,
     content: @Composable BoxScope.() -> Unit
 ) {
     val density = LocalDensity.current
@@ -262,7 +273,8 @@ fun GlassSurface(
         )
     }
 
-    val active = settings.on && backdrop != null
+    // الزجاج نشط فقط مع محرّك GPU حقيقي — وإلا نستخدم البديل الداكن مثل #app.perf في الويب
+    val active = settings.on && backdrop != null && effect != null
 
     Box(
         modifier.onGloballyPositioned {
@@ -287,8 +299,7 @@ fun GlassSurface(
                     }
                     .drawWithContent {
                         if (effect == null) {
-                            // بديل ناعم: تعتيم فاتح يقرأ كزجاج
-                            drawRect(Color.White.copy(alpha = 0.05f))
+                            drawRect(GLASS_FALLBACK)
                         } else {
                             translate(
                                 backdrop.origin.x - posInRoot.x,
@@ -325,12 +336,12 @@ fun GlassSurface(
                     .background(tintColor.copy(alpha = tintAlpha ?: (settings.glassBgOpacity * 0.15f)))
             )
         } else {
-            // وضع التوفير (مطابق لـ #app.perf في الويب)
+            // وضع التوفير — مطابق لـ #app.perf .glass في الويب: زجاج داكن 88%
             Box(
                 Modifier
                     .matchParentSize()
                     .clip(shape)
-                    .background(tintColor.copy(alpha = tintAlpha ?: 0.88f))
+                    .background(fallbackColor)
             )
         }
 

@@ -44,6 +44,8 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.midad.app.glass.BackdropHost
+import com.midad.app.glass.LocalBackdrop
+import com.midad.app.glass.rememberBackdropSource
 import com.midad.app.store.AppStore
 import com.midad.app.store.Block
 import com.midad.app.store.Note
@@ -59,6 +61,10 @@ fun EditorScreen(store: AppStore, note: Note, ui: MidadUi, chromeAlpha: () -> Fl
     val fonts = LocalFonts.current
     val scroll = rememberScrollState()
     val _dv = store.dataVersion // إعادة تركيب عند إضافة/حذف كتل
+
+    // مصدر الخلفية المشترك للشاشة — الرأس والشريط الزجاجي يلتقطان الكتل
+    val backdrop = rememberBackdropSource()
+    androidx.compose.runtime.CompositionLocalProvider(LocalBackdrop provides backdrop) {
 
     Box(
         Modifier
@@ -100,6 +106,7 @@ fun EditorScreen(store: AppStore, note: Note, ui: MidadUi, chromeAlpha: () -> Fl
             // ---------- الكتل (تُسجَّل كخلفية للزجاج) ----------
             Box(Modifier.weight(1f)) {
                 BackdropHost(
+                    backdrop,
                     Modifier
                         .fillMaxSize()
                         .onSizeChanged { ui.editorViewport = it.height.toFloat() }
@@ -178,6 +185,9 @@ fun EditorScreen(store: AppStore, note: Note, ui: MidadUi, chromeAlpha: () -> Fl
                 }
             }
         }
+    }
+
+    // إغلاق مزوّد الخلفية
     }
 }
 
