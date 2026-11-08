@@ -283,8 +283,25 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .ed-tool{border:0;background:none;color:var(--ink-soft);font:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:600;cursor:pointer;padding:6px 7px;border-radius:14px}
 .ed-tool:active{background:rgba(255,255,255,.1);color:var(--ink)}
 .ed-tool .aa{font-size:16px;font-weight:700;line-height:1}
+.ed-top-spacer{width:40px;height:40px;flex:none}
 
-.pop{position:absolute;bottom:86px;left:50%;width:180px;border-radius:16px;padding:8px;z-index:30;transform:translateX(-50%) scale(.6);opacity:0;transform-origin:50% 100%;pointer-events:none;transition:transform .4s cubic-bezier(.3,1.5,.4,1),opacity .2s}
+/* ============ أزرار عائمة داخل المحرر: خروج + كبسولة تراجع/تقدم ============ */
+#edFloat{position:absolute;bottom:88px;left:0;right:0;z-index:21;display:flex;align-items:center;justify-content:center;gap:14px;pointer-events:none}
+#edFloat>*{pointer-events:auto}
+.fab-btn{width:52px;height:52px;border-radius:26px;border:1px solid rgba(255,255,255,.07);background:rgba(30,27,23,.9);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none;backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);box-shadow:0 16px 34px -14px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);transition:background .2s ease,filter .2s ease,opacity .25s ease;will-change:transform}
+.fab-btn:hover{background:rgba(46,41,33,.94)}
+.fab-btn:active{background:rgba(255,255,255,.13)}
+.fab-btn:disabled{opacity:.28;pointer-events:none}
+.fab-exit{background:var(--acc);color:var(--acc-ink);border-color:rgba(0,0,0,.18)}
+.fab-exit:hover{filter:brightness(1.07)}
+.fab-exit:active{filter:brightness(.93)}
+.fab-capsule{display:flex;align-items:center;height:52px;border-radius:26px;border:1px solid rgba(255,255,255,.07);background:rgba(30,27,23,.9);backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);box-shadow:0 16px 34px -14px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);padding:0 5px;will-change:transform}
+.fab-capsule .fab-btn{width:46px;height:44px;border-radius:22px;background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.fab-capsule .fab-btn:active{background:rgba(255,255,255,.12)}
+.fab-sep{width:1px;height:22px;background:var(--line);flex:none}
+@media(max-width:359px){#edFloat{gap:10px}.fab-btn{width:48px;height:48px}.fab-capsule{height:48px}.fab-capsule .fab-btn{width:44px;height:41px}}
+
+.pop{position:absolute;bottom:152px;left:50%;width:180px;border-radius:16px;padding:8px;z-index:30;transform:translateX(-50%) scale(.6);opacity:0;transform-origin:50% 100%;pointer-events:none;transition:transform .4s cubic-bezier(.3,1.5,.4,1),opacity .2s}
 .pop.open{transform:translateX(-50%) scale(1);opacity:1;pointer-events:auto}
 .pop button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;font:inherit;font-size:13.5px;color:var(--ink);padding:9px 12px;border-radius:10px;cursor:pointer;text-align:right}
 .pop button:hover{background:rgba(255,255,255,.08)}
@@ -519,9 +536,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
   <section id="editor" aria-hidden="true">
     <div class="ed-inner">
       <header class="ed-top ed-chrome">
-        <button class="icon-btn" id="edBack" aria-label="رجوع"></button>
-        <button class="icon-btn" id="edUndo" aria-label="تراجع" disabled></button>
-        <button class="icon-btn" id="edRedo" aria-label="إعادة" disabled></button>
+        <span class="ed-top-spacer" aria-hidden="true"></span>
         <div class="ed-top-meta" id="edDate"></div>
         <button class="icon-btn danger" id="edDelete" aria-label="حذف الملاحظة"></button>
       </header>
@@ -542,6 +557,16 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
       <button class="ed-tool" data-act="aa"><span class="aa">Aa</span><span>تنسيق</span></button>
       <button class="ed-tool" data-act="mic"><span class="t-ic" data-ic="mic"></span><span>صوت</span></button>
       <button class="ed-tool" data-act="image"><span class="t-ic" data-ic="image"></span><span>صورة</span></button>
+    </div>
+
+    <!-- الأزرار العائمة داخل المحرر: خروج + كبسولة تراجع/تقدم -->
+    <div id="edFloat" class="ed-chrome">
+      <button class="fab-btn fab-exit" id="edExitF" aria-label="خروج من الملاحظة"></button>
+      <div class="fab-capsule" id="edCapsule" role="group" aria-label="تراجع وتقدم">
+        <button class="fab-btn" id="edUndoF" aria-label="رجوع خطوة" disabled></button>
+        <span class="fab-sep" aria-hidden="true"></span>
+        <button class="fab-btn" id="edRedoF" aria-label="تقدم خطوة" disabled></button>
+      </div>
     </div>
 
     <div id="aaPop" class="pop glass"></div>
@@ -995,7 +1020,7 @@ const app=$('#app'),ed=$('#editor'),edCanvas=$('#edCanvas'),edScroll=$('#edScrol
       notesViewEl=$('#notesView'),tasksViewEl=$('#tasksView'),
       listU=$('#listU'),listD=$('#listD'),headU=$('#headU'),headD=$('#headD'),
       cntU=$('#cntU'),cntD=$('#cntD'),tasksEmptyEl=$('#tasksEmpty'),
-      edUndoBtn=$('#edUndo'),edRedoBtn=$('#edRedo');
+      edUndoBtn=$('#edUndoF'),edRedoBtn=$('#edRedoF');
 
 let view='notes',notesQuery='',tasksQuery='',openNoteId=null,activeText=null,lastActiveBlockEl=null;
 const timerRefs=new Map(),taskDom=new Map();
@@ -1924,8 +1949,11 @@ function openEditor(note,fromEl){
   edScroll.scrollTop=0;
   morphIn((fromEl||fabBtn).getBoundingClientRect());
   deferGlass(edToolbar,null,600);deferGlass(mmEl,null,600);
-  /* زجاج سائل لأزرار الرأس */
+  /* زجاج سائل لأزرار الرأس والكبسولة العائمة */
   $$('.ed-top .icon-btn').forEach(b => deferGlass(b, {radius:20}, 620));
+  deferGlass($('#edCapsule'),{radius:26},680);
+  /* ظهور مطاطي للأزرار العائمة عند فتح الملاحظة */
+  popFloatEd();
   vibrate(8);
 }
 function closeEditor(){
@@ -1945,7 +1973,38 @@ function closeEditor(){
   updateSub();morphOut(tr);vibrate(6);
 }
 edTitle.addEventListener('input',()=>{const n=byId(openNoteId);if(n){n.title=edTitle.value;n.updatedAt=Date.now();saveSoon();pushHistorySoon(openNoteId)}});
-$('#edBack').addEventListener('click',closeEditor);
+$('#edExitF').addEventListener('click',closeEditor);
+/* ===== الأزرار العائمة: نقر مطاطي ===== */
+function rubberTap(el){
+  el.animate([
+    {transform:'scale(.78)'},
+    {transform:'scale(1.14)',offset:.42},
+    {transform:'scale(.94)',offset:.68},
+    {transform:'scale(1.05)',offset:.85},
+    {transform:'scale(1)'}
+  ],{duration:520,easing:'cubic-bezier(.34,1.56,.64,1)'});
+}
+function popFloatEd(){
+  [$('#edExitF'),$('#edCapsule')].forEach((el,i)=>{
+    if(!el)return;
+    el.animate([
+      {opacity:0,transform:'translateY(30px) scale(.5)'},
+      {opacity:1,transform:'translateY(-8px) scale(1.1)',offset:.55},
+      {opacity:1,transform:'translateY(2px) scale(.96)',offset:.78},
+      {opacity:1,transform:'translateY(0) scale(1)'}
+    ],{duration:640,delay:300+i*110,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'});
+  });
+}
+(function(){
+  const cap=$('#edCapsule');
+  $$('#edFloat .fab-btn').forEach(b=>{
+    b.addEventListener('pointerdown',()=>{
+      if(b.disabled)return;
+      rubberTap(b);
+      if(b.id!=='edExitF')rubberTap(cap);
+    });
+  });
+})();
 $('#edDelete').addEventListener('click',async()=>{
   const note=byId(openNoteId);if(!note)return;
   const ok=await confirmDlg({title:'حذف الملاحظة',body:'سيُحذف «'+(note.title||'بدون عنوان')+'» نهائيًا مع كل كتلها.',ok:'حذف'});
@@ -2297,7 +2356,7 @@ document.addEventListener('keydown',e=>{
 function init(){
   $('#btnMenu').innerHTML=icon('dots',22);
   fabBtn.innerHTML=icon('plus',26);
-  $('#edBack').innerHTML=icon('back',22);
+  $('#edExitF').innerHTML=icon('back',22);
   edUndoBtn.innerHTML=icon('undo',20);
   edRedoBtn.innerHTML=icon('redo',20);
   $('#edDelete').innerHTML=icon('trash',18);
@@ -2358,4 +2417,4 @@ init();
 })();
 </script>
 </body>
-</html>
+</html>
